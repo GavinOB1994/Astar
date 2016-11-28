@@ -6,13 +6,15 @@
 #include "SDL.h"
 #endif
 
-
+#include <vector>
 #include "BasicTypes.h"
+
+using namespace std;
 
 
 //Responsible for all drawing operations
 //abstracts away specfic SDL specific drawing functions
-class Renderer{
+class Renderer {
 
 	// size of window in pixels
 	Size2D windowSize;
@@ -20,24 +22,23 @@ class Renderer{
 	//change these if you want to zoom or pan
 	Point2D viewportBottomLeft;
 	Size2D viewportSize;
-
-
 	SDL_Window *window;
 	SDL_Renderer *sdl_renderer;
 
 public:
 	Renderer();
-	bool init(const Size2D&, const char*);
-	void drawRect(const Rect&, const Colour&);
-	void drawWorldRect(const Rect&, const Colour&);
-	void present();
-	void clear(const Colour&);
-	Point2D worldToScreen(const Point2D&);
-	Rect worldToScreen(const Rect&);
-
-	void setViewPort(const Rect&);
-
-	void destroy();
 	~Renderer();
+	bool init(const Size2D&, const char*);
+	void destroy();
+	void drawRect(const Rect&, const Colour&) const;
+	void drawFillRect(const Rect&, const Colour&) const;
+	void drawWorldRect(const Rect&, const Colour&) const;
+	void drawWorldFillRect(const Rect&, const Colour&) const;
+	void present();
+	void clear(const Colour&) const;
+	Point2D worldToScreen(const Point2D&) const;
+	Rect worldToScreen(const Rect&) const;
+	void setViewPort(const Rect&);
+	Size2D getWindowSize() const;
+	SDL_Renderer *getRenderer() const;
 };
-
