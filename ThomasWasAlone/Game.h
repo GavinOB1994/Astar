@@ -4,6 +4,7 @@
 
 #include "Renderer.h"
 #include "GameObject.h"
+#include "Astar.h"
 #include "InputManager.h"
 #include "EventListener.h"
 #include "Constants.h"
@@ -20,7 +21,17 @@ class Game:public EventListener
 	bool quit;
 	int boardSize = 100;
 
-	std::vector<Rect> board;
+	//colours
+	Colour orange = { 255, 140, 0 };
+	Colour yellow = { 255, 255, 0 };
+	Colour black = { 0, 0, 0 };
+	Colour green = { 0, 255, 0 };
+	Colour red = { 255, 0, 0 };
+
+	//std::vector<Rect> board;
+	std::vector<std::vector<Rect>> board;
+
+	Astar astar;
 
 public:
 	Game();

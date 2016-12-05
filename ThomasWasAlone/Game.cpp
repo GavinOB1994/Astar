@@ -2,10 +2,8 @@
 
 #include <iostream>
 using namespace std;
-
-
-
 #include "Game.h"
+
 
 
 const int SCREEN_FPS = 100;
@@ -37,10 +35,30 @@ bool Game::init() {
 	Size2D vpSize(vpWidth, vpWidth /aspectRatio);
 	Point2D vpBottomLeft( -vpSize.w / 2, - vpSize.h / 2); 
 
+	astar = Astar(); //Create my instance of Astar
+	astar.setActive(1, 0);
+	astar.setGoal(3, 3);
+	astar.setWall(5, 5);
+
 	
-	for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++)
+	//for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++)
+	//{
+	//		board.push_back(Rect((winSize.w / BOARDSIZE) * (i % BOARDSIZE), (winSize.h / BOARDSIZE) * (i / BOARDSIZE), winSize.w / BOARDSIZE, winSize.h / BOARDSIZE));
+	//}
+
+	float tWidth = winSize.w / BOARDSIZE;
+	float tHeight = winSize.h / BOARDSIZE;
+
+	for (int i = 0; i < BOARDSIZE; i++)
 	{
-			board.push_back(Rect((winSize.w / BOARDSIZE) * (i / BOARDSIZE), (winSize.h / BOARDSIZE) * (i % BOARDSIZE), winSize.w / BOARDSIZE, winSize.h / BOARDSIZE));
+		std::vector<Rect> rectLine;
+
+		for (int j = 0; j < BOARDSIZE; j++)
+		{
+			rectLine.push_back( Rect(tWidth * i, tHeight * j, tWidth, tHeight));
+		}
+
+		board.push_back(rectLine);
 	}
 
 	Rect vpRect(vpBottomLeft,vpSize);
@@ -76,38 +94,34 @@ void Game::update()
 
 void Game::render()
 {
-	Rect *rect = new Rect(0, 0, 10, 10);
-	Colour orange = { 255, 140, 0 };
-	Colour yellow = { 255, 255, 0 };
-
 	renderer.clear(Colour(0,0,0));// prepare for new frame
 
-	for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++)
+	for (int i = 0; i < BOARDSIZE; i++)
 	{
-		if ((i / BOARDSIZE)%2 == 0)
+		for (int j = 0; j < BOARDSIZE; j++)
 		{
-			if (i % 2 == 0)
+			if (i % 2 == 0) //all code below creates the checkerboard pattern
 			{
-				renderer.drawFillRect(board[i], orange);
+				if (j % 2 == 0)
+					renderer.drawFillRect(board[i][j], orange);
+				else
+					renderer.drawFillRect(board[i][j], yellow);
 			}
 			else
 			{
-				renderer.drawFillRect(board[i], yellow);
+				if (j % 2 == 0)
+					renderer.drawFillRect(board[i][j], yellow);
+				else
+					renderer.drawFillRect(board[i][j], orange);
 			}
-		}
-		else
-		{
-			if (i % 2 == 1)
-			{
-				renderer.drawFillRect(board[i], orange);
-			}
-			else
-			{
-				renderer.drawFillRect(board[i], yellow);
-			}
-		}
 
-		
+			if (astar.getGoal() == std::pair<int, int>(i, j))
+				renderer.drawFillRect(board[i][j], red);
+			else if (astar.getActive() == std::pair<int, int>(i, j)) //sets the active tile to green
+				renderer.drawFillRect(board[i][j], green);
+			//else if (std::find(astar.getWalls().begin(), astar.getWalls().end(), std::pair<int, int>(i, j)) != astar.getWalls().end()) //sets the walls to black
+			//	renderer.drawFillRect(board[i][j], black);
+		}	
 	}
 
 	renderer.present();// display the new frame (swap buffers)	
