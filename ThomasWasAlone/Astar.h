@@ -11,6 +11,7 @@ private:
 	std::vector<std::pair<int,int>> m_closed;
 	std::vector<std::pair<int, int>> m_walls;
 	std::pair<int, int> m_goal;
+	std::pair<int, int> m_start;
 	std::pair<int, int> m_active;
 	std::pair<int, int> m_prevActive;
 
@@ -21,6 +22,8 @@ public:
 	void doAstar();
 
 	Node getNode(std::pair<int, int>);
+
+	bool isOnList(std::vector<std::pair<int, int>>, std::pair<int, int>);
 
 	std::pair<int, int> getGoal();
 	void setGoal(std::pair<int, int>);
@@ -37,6 +40,6 @@ public:
 	std::vector<std::pair<int, int>> getClosed();
 	void setClosed(std::pair<int, int>);
 
-	void calculateCosts(std::pair<int, int>);
+	void calculateSurroundingCosts(std::pair<int, int>);
 };
 

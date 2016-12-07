@@ -11,7 +11,7 @@ private:
 	std::pair<int, int> m_pos;
 
 public:
-	void calculateCosts();
+	void calculateCosts(/*goal*/std::pair<int, int>, /*start*/std::pair<int, int>);
 
 	Node(int, int);
 	~Node();

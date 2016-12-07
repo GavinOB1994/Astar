@@ -23,12 +23,40 @@ Astar::~Astar()
 void Astar::doAstar()
 {
 
+	calculateSurroundingCosts(m_active);
 }
 
-void Astar::calculateCosts(std::pair<int, int> index)
+void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 {
+	//up
+	if (index.first - 1 >= 0 && !isOnList(m_closed, std::pair<int, int>(index.first - 1, index.second))) //ensures it's not out of range or in the closed list
+			m_nodes[index.first - 1][index.second].calculateCosts(m_goal, m_start);
+	//down
+	if (index.first + 1 <= BOARDSIZE && !isOnList(m_closed, std::pair<int, int>(index.first + 1, index.second)))
+		m_nodes[index.first + 1][index.second].calculateCosts(m_goal, m_start);
+	//left
+	if (index.second - 1 >= 0 && !isOnList(m_closed, std::pair<int, int>(index.first, index.second - 1)))
+		m_nodes[index.first][index.second - 1].calculateCosts(m_goal, m_start);
+	//right
+	if (index.second + 1 <= BOARDSIZE && !isOnList(m_closed, std::pair<int, int>(index.first, index.second + 1)))
+		m_nodes[index.first][index.second + 1].calculateCosts(m_goal, m_start);
+	//upRight
+	if ((index.first - 1 >= 0 && index.second + 1 <= BOARDSIZE) && !isOnList(m_closed, std::pair<int, int>(index.first - 1, index.second + 1)))
+		m_nodes[index.first - 1][index.second + 1].calculateCosts(m_goal, m_start);
+	//downRight
+	if ((index.first + 1 <= BOARDSIZE && index.second + 1 <= BOARDSIZE) && !isOnList(m_closed, std::pair<int, int>(index.first + 1, index.second + 1)))
+		m_nodes[index.first + 1][index.second + 1].calculateCosts(m_goal, m_start);
+	//upLeft
+	if ((index.first - 1 >= 0 && index.second - 1 >= 0) && !isOnList(m_closed, std::pair<int, int>(index.first - 1, index.second - 1)))
+		m_nodes[index.first - 1][index.second - 1].calculateCosts(m_goal, m_start);
+	//downLeft
+	if ((index.first + 1 <= BOARDSIZE && index.second - 1 >= 0) && !isOnList(m_closed, std::pair<int, int>(index.first + 1, index.second - 1)))
+		m_nodes[index.first + 1][index.second - 1].calculateCosts(m_goal, m_start);
+}
 
-
+bool Astar::isOnList(std::vector<std::pair<int, int>> list, std::pair<int, int> item)
+{
+	return std::find(list.begin(), list.end(), item) != list.end();
 }
 
 Node Astar::getNode(std::pair<int, int> index)

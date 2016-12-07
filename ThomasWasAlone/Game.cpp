@@ -96,6 +96,8 @@ void Game::render()
 {
 	renderer.clear(Colour(0,0,0));// prepare for new frame
 
+	std::vector<std::pair<int, int>> tempWalls = astar.getWalls();
+
 	for (int i = 0; i < BOARDSIZE; i++)
 	{
 		for (int j = 0; j < BOARDSIZE; j++)
@@ -119,8 +121,8 @@ void Game::render()
 				renderer.drawFillRect(board[i][j], red);
 			else if (astar.getActive() == std::pair<int, int>(i, j)) //sets the active tile to green
 				renderer.drawFillRect(board[i][j], green);
-			//else if (std::find(astar.getWalls().begin(), astar.getWalls().end(), std::pair<int, int>(i, j)) != astar.getWalls().end()) //sets the walls to black
-			//	renderer.drawFillRect(board[i][j], black);
+			else if (astar.isOnList(astar.getWalls(), std::pair<int, int>(i, j))) //sets the walls to black
+				renderer.drawFillRect(board[i][j], black);
 		}	
 	}
 

@@ -13,7 +13,7 @@ Node::~Node()
 {
 }
 
-void Node::calculateCosts()
+void Node::calculateCosts(std::pair<int, int> goal, std::pair<int, int> start)
 {
 
 }
