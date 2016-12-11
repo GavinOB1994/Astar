@@ -35,9 +35,9 @@ bool Game::init() {
 	Size2D vpSize(vpWidth, vpWidth /aspectRatio);
 	Point2D vpBottomLeft( -vpSize.w / 2, - vpSize.h / 2); 
 
-	astar = Astar(); //Create my instance of Astar
-	astar.setActive(1, 0);
-	astar.setGoal(3, 3);
+	astar = Astar(std::pair<int, int>(1, 1) , std::pair<int, int>(3, 3)); //Create my instance of Astar
+	//astar.setActive(1, 0);
+	//astar.setGoal(3, 3);
 	astar.setWall(5, 5);
 
 	
