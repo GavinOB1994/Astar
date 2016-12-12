@@ -27,6 +27,7 @@ class Game:public EventListener
 	Colour black = { 0, 0, 0 };
 	Colour green = { 0, 255, 0 };
 	Colour red = { 255, 0, 0 };
+	Colour blue = { 0, 0, 255 };
 
 	//std::vector<Rect> board;
 	std::vector<std::vector<Rect>> board;

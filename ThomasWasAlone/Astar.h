@@ -22,7 +22,7 @@ public:
 	Astar(std::pair<int, int>, std::pair<int, int>);
 	~Astar();
 
-	void doAstar();
+	bool doAstar();
 
 	Node getNode(std::pair<int, int>);
 
@@ -48,6 +48,7 @@ public:
 
 	std::vector<std::pair<int, int>> getClosed();
 	void setClosed(std::pair<int, int>);
+	void setClosed(int, int);
 
 	void calculateSurroundingCosts(std::pair<int, int>);
 };

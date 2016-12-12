@@ -21,7 +21,8 @@ void Node::calculateCosts(std::pair<int, int> goal, std::pair<int, int> start)
 
 bool Node::operator<(const Node & n) const
 {
-	return h > n.h; //The operator is reversed for the sake of the priority queue, so that the smallest go to the top
+	//changing this between f or h will change the searches priority
+	return h + g > n.h + n.g; //The operator is reversed for the sake of the priority queue, so that the smallest go to the top
 }
 
 bool Node::operator==(const Node & n) const

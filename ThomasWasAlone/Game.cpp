@@ -35,7 +35,7 @@ bool Game::init() {
 	Size2D vpSize(vpWidth, vpWidth /aspectRatio);
 	Point2D vpBottomLeft( -vpSize.w / 2, - vpSize.h / 2); 
 
-	astar = Astar(std::pair<int, int>(1, 1) , std::pair<int, int>(3, 3)); //Create my instance of Astar
+	astar = Astar(std::pair<int, int>(7, 7) , std::pair<int, int>(24, 28)); //Create my instance of Astar
 	//astar.setActive(1, 0);
 	//astar.setGoal(3, 3);
 	astar.setWall(5, 5);
@@ -65,7 +65,7 @@ bool Game::init() {
 	renderer.setViewPort(vpRect);
 
 
-	//create some game objects
+	astar.doAstar();
 
 
 	
@@ -123,6 +123,8 @@ void Game::render()
 				renderer.drawFillRect(board[i][j], green);
 			else if (astar.isOnList(astar.getWalls(), std::pair<int, int>(i, j))) //sets the walls to black
 				renderer.drawFillRect(board[i][j], black);
+			else if (astar.isOnList(astar.getClosed(), std::pair<int, int>(i, j))) //sets the closed to black
+				renderer.drawFillRect(board[i][j], blue);
 		}	
 	}
 
