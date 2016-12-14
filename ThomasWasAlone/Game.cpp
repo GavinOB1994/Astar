@@ -10,6 +10,21 @@ const int SCREEN_FPS = 100;
 const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 
 
+
+int threadFunction(void* data)
+{
+	Astar *a = (Astar*)data;
+
+	while (a->getActive() != a->getGoal())
+	{
+		a->doAstar();
+	}
+
+	return 0;
+}
+
+
+
 Game::Game()
 {
 	pause = false;
@@ -35,16 +50,9 @@ bool Game::init() {
 	Size2D vpSize(vpWidth, vpWidth /aspectRatio);
 	Point2D vpBottomLeft( -vpSize.w / 2, - vpSize.h / 2); 
 
-	astar = Astar(std::pair<int, int>(7, 7) , std::pair<int, int>(24, 28)); //Create my instance of Astar
-	//astar.setActive(1, 0);
-	//astar.setGoal(3, 3);
-	astar.setWall(5, 5);
+	astar = Astar(std::pair<int, int>(2, 2) , std::pair<int, int>(BOARDSIZE - 1, BOARDSIZE - 1)); //Create my instance of Astar
 
-	
-	//for (int i = 0; i < BOARDSIZE * BOARDSIZE; i++)
-	//{
-	//		board.push_back(Rect((winSize.w / BOARDSIZE) * (i % BOARDSIZE), (winSize.h / BOARDSIZE) * (i / BOARDSIZE), winSize.w / BOARDSIZE, winSize.h / BOARDSIZE));
-	//}
+	astar2 = Astar(std::pair<int, int>(10, 10), std::pair<int, int>(BOARDSIZE - 10, BOARDSIZE - 10)); //Create my instance of Astar
 
 	float tWidth = winSize.w / BOARDSIZE;
 	float tHeight = winSize.h / BOARDSIZE;
@@ -54,9 +62,7 @@ bool Game::init() {
 		std::vector<Rect> rectLine;
 
 		for (int j = 0; j < BOARDSIZE; j++)
-		{
 			rectLine.push_back( Rect(tWidth * i, tHeight * j, tWidth, tHeight));
-		}
 
 		board.push_back(rectLine);
 	}
@@ -65,11 +71,14 @@ bool Game::init() {
 	renderer.setViewPort(vpRect);
 
 
-	astar.doAstar();
+	//astar.doAstar();
 
-
-	
-
+	//Run the thread
+	int data = NULL;
+	SDL_Thread* thread1 = SDL_CreateThread(threadFunction, "LazyThread", &astar);
+	SDL_Thread* thread2 = SDL_CreateThread(threadFunction, "LazyThread", &astar2);
+	SDL_DetachThread(thread1);
+	SDL_DetachThread(thread2);
 	//want game loop to pause
 	inputManager.AddListener(EventListener::Event::PAUSE, this);
 	inputManager.AddListener(EventListener::Event::QUIT, this);
@@ -77,6 +86,8 @@ bool Game::init() {
 	return true;
 
 }
+
+
 
 
 void Game::destroy()
@@ -87,7 +98,10 @@ void Game::destroy()
 //** calls update on all game entities*/
 void Game::update()
 {
-
+	//while (astar.getActive() != astar.getGoal())
+	//{
+	//	astar.doAstar();
+	//}
 }
 
 //** calls render on all game entities*/
@@ -95,8 +109,6 @@ void Game::update()
 void Game::render()
 {
 	renderer.clear(Colour(0,0,0));// prepare for new frame
-
-	std::vector<std::pair<int, int>> tempWalls = astar.getWalls();
 
 	for (int i = 0; i < BOARDSIZE; i++)
 	{
@@ -117,14 +129,16 @@ void Game::render()
 					renderer.drawFillRect(board[i][j], orange);
 			}
 
-			if (astar.getGoal() == std::pair<int, int>(i, j))
+			if (astar.getGoal() == std::pair<int, int>(i, j)) //sets the goal tile to red
 				renderer.drawFillRect(board[i][j], red);
-			else if (astar.getActive() == std::pair<int, int>(i, j)) //sets the active tile to green
+			else if (astar.getStart() == std::pair<int, int>(i, j)) //sets the start tile to green
 				renderer.drawFillRect(board[i][j], green);
-			else if (astar.isOnList(astar.getWalls(), std::pair<int, int>(i, j))) //sets the walls to black
+			else if (astar.getActive() == std::pair<int, int>(i, j)) //sets the active tile to black
 				renderer.drawFillRect(board[i][j], black);
-			else if (astar.isOnList(astar.getClosed(), std::pair<int, int>(i, j))) //sets the closed to black
-				renderer.drawFillRect(board[i][j], blue);
+			//else if (astar.isOnList(astar.getWalls(), std::pair<int, int>(i, j))) //sets the walls to black
+			//	renderer.drawFillRect(board[i][j], black);
+			//else if (astar.isOnList(astar.getClosed(), std::pair<int, int>(i, j))) //sets the closed to blue
+			//	renderer.drawFillRect(board[i][j], blue);
 		}	
 	}
 
@@ -134,14 +148,14 @@ void Game::render()
 /** update and render game entities*/
 void Game::loop()
 {
-	while (!quit) { //game loop
-
+	while (!quit) 
+	{ //game loop
 		inputManager.ProcessInput();
 
 		if(!pause) //in pause mode don't bother updateing
 			update();
-		render();
 
+		render();
 	}
 }
 

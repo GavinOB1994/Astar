@@ -17,12 +17,7 @@ Astar::Astar(std::pair<int, int> start, std::pair<int, int> end)
 	setStart(start);
 	setGoal(end);
 
-	//for (int i = 0; i < BOARDSIZE; i++) //reserves the apropriate board size
-	//{
-	//	std::vector<Node> nodeLine;
-	//	nodeLine.reserve(BOARDSIZE);
-	//	m_nodes.push_back(nodeLine);
-	//}
+
 
 	//m_nodes[start.first][start.second] = Node(start.first, start.second);
 	m_nodes[start.first][start.second].calculateCosts(end, start);
@@ -36,7 +31,7 @@ Astar::~Astar()
 {
 }
 
-bool Astar::doAstar()
+void Astar::doAstar()
 {
 	calculateSurroundingCosts(m_active);
 
@@ -46,24 +41,12 @@ bool Astar::doAstar()
 	Node tempNode = searchOrder.top();
 	searchOrder.pop(); //Remove from the priority queue
 	m_active = tempNode.getPos();
-	
-
-	if (m_active == m_goal)
-	{
-		
-		return true;
-	}
-	else
-	{
-		doAstar();
-		return false;
-	}
 }
 
 void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 {
 	//up
-	if (index.first - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second))/* && !isOpen(m_nodes[index.first - 1][index.second])*/) //ensures it's not out of range or in the closed list or in the walls list
+	if (index.first - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second)) && !isOpen(m_nodes[index.first - 1][index.second])) //ensures it's not out of range or in the closed list or in the walls list
 	{
 		m_nodes[index.first - 1][index.second] = Node(index.first - 1, index.second);
 		m_nodes[index.first - 1][index.second].calculateCosts(m_goal, m_start);
@@ -71,7 +54,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 		setClosed(index.first - 1, index.second);
 	}
 	//down
-	if (index.first + 1 <= BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second))/* && !isOpen(m_nodes[index.first + 1][index.second])*/)
+	if (index.first + 1 < BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second)) && !isOpen(m_nodes[index.first + 1][index.second]))
 	{
 		m_nodes[index.first + 1][index.second] = Node(index.first + 1, index.second);
 		m_nodes[index.first + 1][index.second].calculateCosts(m_goal, m_start);
@@ -79,7 +62,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 		setClosed(index.first + 1, index.second);
 	}
 	//left
-	if (index.second - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first, index.second - 1))/* && !isOpen(m_nodes[index.first][index.second - 1])*/)
+	if (index.second - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first, index.second - 1)) && !isOpen(m_nodes[index.first][index.second - 1]))
 	{
 		m_nodes[index.first][index.second - 1] = Node(index.first, index.second - 1);
 		m_nodes[index.first][index.second - 1].calculateCosts(m_goal, m_start);
@@ -87,55 +70,55 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 		setClosed(index.first, index.second - 1);
 	}
 	//right
-	if (index.second + 1 <= BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first, index.second + 1))/* && !isOpen(m_nodes[index.first][index.second + 1])*/)
+	if (index.second + 1 < BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first, index.second + 1)) && !isOpen(m_nodes[index.first][index.second + 1]))
 	{
 		m_nodes[index.first][index.second + 1] = Node(index.first, index.second + 1);
 		m_nodes[index.first][index.second + 1].calculateCosts(m_goal, m_start);
 		searchOrder.push(m_nodes[index.first][index.second + 1]);
 		setClosed(index.first, index.second + 1);
 	}
-	//upRight
-	if ((index.first - 1 >= 0 && index.second + 1 <= BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second + 1))/* && !isOpen(m_nodes[index.first - 1][index.second + 1])*/)
-	{
-		m_nodes[index.first - 1][index.second + 1] = Node(index.first - 1, index.second + 1);
-		m_nodes[index.first - 1][index.second + 1].calculateCosts(m_goal, m_start);
-		searchOrder.push(m_nodes[index.first - 1][index.second + 1]);
-		setClosed(index.first - 1, index.second + 1);
-	}
-	//downRight
-	if ((index.first + 1 <= BOARDSIZE && index.second + 1 <= BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second + 1))/* && !isOpen(m_nodes[index.first + 1][index.second + 1])*/)
-	{
-		m_nodes[index.first + 1][index.second + 1] = Node(index.first + 1, index.second + 1);
-		m_nodes[index.first + 1][index.second + 1].calculateCosts(m_goal, m_start);
-		searchOrder.push(m_nodes[index.first + 1][index.second + 1]);
-		setClosed(index.first + 1, index.second + 1);
-	}
-	//upLeft
-	if ((index.first - 1 >= 0 && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second - 1))/* && !isOpen(m_nodes[index.first - 1][index.second - 1])*/)
-	{
-		m_nodes[index.first - 1][index.second - 1] = Node(index.first - 1, index.second - 1);
-		m_nodes[index.first - 1][index.second - 1].calculateCosts(m_goal, m_start);
-		searchOrder.push(m_nodes[index.first - 1][index.second - 1]);
-		setClosed(index.first - 1, index.second - 1);
-	}
-	//downLeft
-	if ((index.first + 1 <= BOARDSIZE && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second - 1))/* && !isOpen(m_nodes[index.first + 1][index.second - 1])*/)
-	{
-		m_nodes[index.first + 1][index.second - 1] = Node(index.first + 1, index.second - 1);
-		m_nodes[index.first + 1][index.second - 1].calculateCosts(m_goal, m_start);
-		searchOrder.push(m_nodes[index.first + 1][index.second - 1]);
-		setClosed(index.first + 1, index.second - 1);
-	}
+	////upRight
+	//if ((index.first - 1 >= 0 && index.second + 1 < BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second + 1)) && !isOpen(m_nodes[index.first - 1][index.second + 1]))
+	//{
+	//	m_nodes[index.first - 1][index.second + 1] = Node(index.first - 1, index.second + 1);
+	//	m_nodes[index.first - 1][index.second + 1].calculateCosts(m_goal, m_start);
+	//	searchOrder.push(m_nodes[index.first - 1][index.second + 1]);
+	//	setClosed(index.first - 1, index.second + 1);
+	//}
+	////downRight
+	//if ((index.first + 1 < BOARDSIZE && index.second + 1 < BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second + 1)) && !isOpen(m_nodes[index.first + 1][index.second + 1]))
+	//{
+	//	m_nodes[index.first + 1][index.second + 1] = Node(index.first + 1, index.second + 1);
+	//	m_nodes[index.first + 1][index.second + 1].calculateCosts(m_goal, m_start);
+	//	searchOrder.push(m_nodes[index.first + 1][index.second + 1]);
+	//	setClosed(index.first + 1, index.second + 1);
+	//}
+	////upLeft
+	//if ((index.first - 1 >= 0 && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second - 1)) && !isOpen(m_nodes[index.first - 1][index.second - 1]))
+	//{
+	//	m_nodes[index.first - 1][index.second - 1] = Node(index.first - 1, index.second - 1);
+	//	m_nodes[index.first - 1][index.second - 1].calculateCosts(m_goal, m_start);
+	//	searchOrder.push(m_nodes[index.first - 1][index.second - 1]);
+	//	setClosed(index.first - 1, index.second - 1);
+	//}
+	////downLeft
+	//if ((index.first + 1 < BOARDSIZE && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second - 1)) && !isOpen(m_nodes[index.first + 1][index.second - 1]))
+	//{
+	//	m_nodes[index.first + 1][index.second - 1] = Node(index.first + 1, index.second - 1);
+	//	m_nodes[index.first + 1][index.second - 1].calculateCosts(m_goal, m_start);
+	//	searchOrder.push(m_nodes[index.first + 1][index.second - 1]);
+	//	setClosed(index.first + 1, index.second - 1);
+	//}
 }
 
-bool Astar::isOnList(std::vector<std::pair<int, int>> list, std::pair<int, int> item)
+bool Astar::isOnList(std::vector<std::pair<int, int>>* list, std::pair<int, int> item)
 {
-	return std::find(list.begin(), list.end(), item) != list.end();
+	return std::find(list->begin(), list->end(), item) != list->end();
 }
 
 bool Astar::isTraversable(std::vector<std::pair<int, int>> list, std::pair<int, int> item)
 {
-	if (isOnList(m_walls, item) || isOnList(m_closed, item))
+	if (isOnList(&m_walls, item) || isOnList(&m_closed, item))
 	{
 		return false;
 	}
@@ -145,17 +128,17 @@ bool Astar::isTraversable(std::vector<std::pair<int, int>> list, std::pair<int, 
 	}
 }
 
-//bool Astar::isOpen(Node item)
-//{
-//	for (int i = 0; i < BOARDSIZE; i++)
-//	{ 
-//		if (std::find(m_nodes[i].begin(), m_nodes[i].end(), item) != m_nodes[i].end())
-//		{
-//			return true;
-//		}
-//	}
-//	return false;
-//}
+bool Astar::isOpen(Node item)
+{
+	if (std::find(m_closed.begin(), m_closed.end(), item.getPos()) != m_closed.end())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 Node Astar::getNode(std::pair<int, int> index) { return m_nodes[index.first][index.second]; }
 

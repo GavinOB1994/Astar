@@ -1,9 +1,8 @@
 #pragma once
 
 #include <vector>
-
+#include <SDL_thread.h>
 #include "Renderer.h"
-#include "GameObject.h"
 #include "Astar.h"
 #include "InputManager.h"
 #include "EventListener.h"
@@ -33,6 +32,7 @@ class Game:public EventListener
 	std::vector<std::vector<Rect>> board;
 
 	Astar astar;
+	Astar astar2;
 
 public:
 	Game();
@@ -40,7 +40,7 @@ public:
 
 	bool init();
 	void destroy();
-
+	//int threadFunction(void*);
 	void update();
 	void render();
 	void loop();

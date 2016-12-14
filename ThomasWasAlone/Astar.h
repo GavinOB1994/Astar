@@ -22,11 +22,11 @@ public:
 	Astar(std::pair<int, int>, std::pair<int, int>);
 	~Astar();
 
-	bool doAstar();
+	void doAstar();
 
 	Node getNode(std::pair<int, int>);
 
-	bool isOnList(std::vector<std::pair<int, int>>, std::pair<int, int>);
+	bool isOnList(std::vector<std::pair<int, int>>*, std::pair<int, int>);
 	bool isTraversable(std::vector<std::pair<int, int>>, std::pair<int, int>);
 	bool isOpen(Node);
 
