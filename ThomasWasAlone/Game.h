@@ -31,8 +31,19 @@ class Game:public EventListener
 	//std::vector<Rect> board;
 	std::vector<std::vector<Rect>> board;
 
-	Astar astar;
-	Astar astar2;
+	//std::vector<std::pair<int, int>> walls;
+
+	std::vector<Astar> astar;
+
+	std::queue<Astar*> jobQueue;
+
+	//Astar astar;
+	//Astar astar2;
+	//Astar astar3;
+	//Astar astar4;
+	//Astar astar5;
+
+	
 
 public:
 	Game();

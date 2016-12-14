@@ -17,6 +17,7 @@ int threadFunction(void* data)
 
 	while (a->getActive() != a->getGoal())
 	{
+		//cout << "astar" << endl;
 		a->doAstar();
 	}
 
@@ -37,7 +38,8 @@ Game::~Game()
 }
 
 
-bool Game::init() {	
+bool Game::init() 
+{	
 	Size2D winSize(1000,1000);
 
 	//creates our renderer, which looks after drawing and the window
@@ -47,12 +49,36 @@ bool Game::init() {
 	//we want the vp centred on origin and 20 units wide
 	float aspectRatio = winSize.w / winSize.h;
 	float vpWidth = 20;
+
 	Size2D vpSize(vpWidth, vpWidth /aspectRatio);
 	Point2D vpBottomLeft( -vpSize.w / 2, - vpSize.h / 2); 
 
-	astar = Astar(std::pair<int, int>(2, 2) , std::pair<int, int>(BOARDSIZE - 1, BOARDSIZE - 1)); //Create my instance of Astar
+	Rect vpRect(vpBottomLeft, vpSize);
+	renderer.setViewPort(vpRect);
 
-	astar2 = Astar(std::pair<int, int>(10, 10), std::pair<int, int>(BOARDSIZE - 10, BOARDSIZE - 10)); //Create my instance of Astar
+	//int wall1 = rand() % BOARDSIZE;
+	//int wall2 = rand() % BOARDSIZE;
+	//int wall3 = rand() % BOARDSIZE;
+
+	//for (int i = 0; i < rand() % ((BOARDSIZE / 3) * 2); i++)
+	//{
+	//	walls.push_back(std::pair<int, int>(wall1, i));
+	//}
+
+	
+
+	for (int i = 0; i < NOOFASTAR; i++)
+	{
+		astar.push_back(Astar(std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE), std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE)));
+	}
+
+
+	//astar = Astar(std::pair<int, int>(2, 2) , std::pair<int, int>(BOARDSIZE - 1, BOARDSIZE - 1)/*, &walls*/); //Create my instance of Astar
+	//astar2 = Astar(std::pair<int, int>(10, 10), std::pair<int, int>(BOARDSIZE - 10, BOARDSIZE - 10)/*, &walls*/); //Create my instance of Astar
+	//astar3 = Astar(std::pair<int, int>(11, 10), std::pair<int, int>(BOARDSIZE - 5, BOARDSIZE - 5)/*, &walls*/); //Create my instance of Astar
+	//astar4 = Astar(std::pair<int, int>(10, 20), std::pair<int, int>(BOARDSIZE - 10, BOARDSIZE - 5)/*, &walls*/); //Create my instance of Astar
+	//astar5 = Astar(std::pair<int, int>(13, 10), std::pair<int, int>(BOARDSIZE - 5, BOARDSIZE - 10)/*, &walls*/); //Create my instance of Astar
+
 
 	float tWidth = winSize.w / BOARDSIZE;
 	float tHeight = winSize.h / BOARDSIZE;
@@ -67,24 +93,26 @@ bool Game::init() {
 		board.push_back(rectLine);
 	}
 
-	Rect vpRect(vpBottomLeft,vpSize);
-	renderer.setViewPort(vpRect);
-
-
-	//astar.doAstar();
 
 	//Run the thread
 	int data = NULL;
-	SDL_Thread* thread1 = SDL_CreateThread(threadFunction, "LazyThread", &astar);
-	SDL_Thread* thread2 = SDL_CreateThread(threadFunction, "LazyThread", &astar2);
+	SDL_Thread* thread1 = SDL_CreateThread(threadFunction, "Astar 1", &astar[0]);
+	SDL_Thread* thread2 = SDL_CreateThread(threadFunction, "Astar 2", &astar[1]);
+	SDL_Thread* thread3 = SDL_CreateThread(threadFunction, "Astar 3", &astar[2]);
+	SDL_Thread* thread4 = SDL_CreateThread(threadFunction, "Astar 4", &astar[3]);
+	SDL_Thread* thread5 = SDL_CreateThread(threadFunction, "Astar 5", &astar[4]);
+
 	SDL_DetachThread(thread1);
 	SDL_DetachThread(thread2);
+	SDL_DetachThread(thread3);
+	SDL_DetachThread(thread4);
+	SDL_DetachThread(thread5);
+
 	//want game loop to pause
 	inputManager.AddListener(EventListener::Event::PAUSE, this);
 	inputManager.AddListener(EventListener::Event::QUIT, this);
 
 	return true;
-
 }
 
 
@@ -129,16 +157,28 @@ void Game::render()
 					renderer.drawFillRect(board[i][j], orange);
 			}
 
-			if (astar.getGoal() == std::pair<int, int>(i, j)) //sets the goal tile to red
-				renderer.drawFillRect(board[i][j], red);
-			else if (astar.getStart() == std::pair<int, int>(i, j)) //sets the start tile to green
-				renderer.drawFillRect(board[i][j], green);
-			else if (astar.getActive() == std::pair<int, int>(i, j)) //sets the active tile to black
-				renderer.drawFillRect(board[i][j], black);
-			//else if (astar.isOnList(astar.getWalls(), std::pair<int, int>(i, j))) //sets the walls to black
+			for (int k = 0; k < NOOFASTAR; k++)
+			{
+				if (SDL_LockMutex(astar[k].getMutex()) == 0)
+				{
+					std::pair<int, int> index = std::pair<int, int>(i, j);
+
+					if (astar[k].getGoal() == index) //sets the goal tile to red
+						renderer.drawFillRect(board[i][j], red);
+					if (astar[k].getStart() == index) //sets the start tile to green
+						renderer.drawFillRect(board[i][j], green);
+					if (astar[k].getActive() == index) //sets the active tile to black
+						renderer.drawFillRect(board[i][j], black);
+
+					SDL_UnlockMutex(astar[k].getMutex());
+				}
+			}
+
+
+			//else if (astar.isOnList(&walls, std::pair<int, int>(i, j))) //sets the walls to black
 			//	renderer.drawFillRect(board[i][j], black);
-			//else if (astar.isOnList(astar.getClosed(), std::pair<int, int>(i, j))) //sets the closed to blue
-			//	renderer.drawFillRect(board[i][j], blue);
+			//if (astar.isOnList(&astar.getClosed(), std::pair<int, int>(i, j))) //sets the closed to blue
+			//	renderer.drawFillRect(board[i][j], blue);			
 		}	
 	}
 

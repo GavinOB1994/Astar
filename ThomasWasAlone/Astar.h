@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <queue>
+#include <SDL_thread.h>
 #include "Node.h"
 #include "Constants.h"
 
@@ -17,9 +18,11 @@ private:
 	std::pair<int, int> m_active;
 	std::pair<int, int> m_prevActive;
 
+	SDL_mutex *mutex;
+
 public:
 	Astar() {};
-	Astar(std::pair<int, int>, std::pair<int, int>);
+	Astar(std::pair<int, int>, std::pair<int, int>/*, std::vector<std::pair<int, int>>**/);
 	~Astar();
 
 	void doAstar();
@@ -42,9 +45,11 @@ public:
 	void setStart(std::pair<int, int>);
 	void setStart(int, int);
 
-	std::vector<std::pair<int, int>> getWalls();
-	void setWall(std::pair<int, int>);
-	void setWall(int, int);
+	SDL_mutex* getMutex();
+
+	//std::vector<std::pair<int, int>> getWalls();
+	//void setWall(std::pair<int, int>);
+	//void setWall(int, int);
 
 	std::vector<std::pair<int, int>> getClosed();
 	void setClosed(std::pair<int, int>);

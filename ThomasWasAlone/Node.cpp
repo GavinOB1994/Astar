@@ -23,6 +23,7 @@ bool Node::operator<(const Node & n) const
 {
 	//changing this between f or h will change the searches priority
 	return h + g > n.h + n.g; //The operator is reversed for the sake of the priority queue, so that the smallest go to the top
+	//return (2 * h) + g > (2 * n.h) + n.g; //The operator is reversed for the sake of the priority queue, so that the smallest go to the top
 }
 
 bool Node::operator==(const Node & n) const
