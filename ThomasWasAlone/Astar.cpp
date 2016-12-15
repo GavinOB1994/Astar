@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "Astar.h"
 
-Astar::Astar(std::pair<int, int> start, std::pair<int, int> end/*, std::vector<std::pair<int, int>>**/)
+
+Astar::Astar(std::pair<int, int> start, std::pair<int, int> end)
 {
 	mutex = SDL_CreateMutex(); //Creates the mutex for locking this thread
 
@@ -40,15 +41,15 @@ void Astar::doAstar()
 
 
 	m_prevActive = m_active; //just before the new active is assigned keep reor od the old active
-	Node tempNode = searchOrder.top();
+	m_tempNode = searchOrder.top();
 	searchOrder.pop(); //Remove from the priority queue
-	m_active = tempNode.getPos();
+	m_active = m_tempNode.getPos();
 }
 
 void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 {
 	//up
-	if (index.first - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second)) && !isOpen(m_nodes[index.first - 1][index.second])) //ensures it's not out of range or in the closed list or in the walls list
+	if (index.first - 1 >= 0 && isTraversable(std::pair<int, int>(index.first - 1, index.second)) && !isOpen(m_nodes[index.first - 1][index.second])) //ensures it's not out of range or in the closed list or in the walls list
 	{
 		if (SDL_LockMutex(mutex) == 0)
 		{
@@ -61,7 +62,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 
 	}
 	//down
-	if (index.first + 1 < BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second)) && !isOpen(m_nodes[index.first + 1][index.second]))
+	if (index.first + 1 < BOARDSIZE && isTraversable( std::pair<int, int>(index.first + 1, index.second)) && !isOpen(m_nodes[index.first + 1][index.second]))
 	{
 		if (SDL_LockMutex(mutex) == 0)
 		{
@@ -72,7 +73,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 		}
 	}
 	//left
-	if (index.second - 1 >= 0 && isTraversable(m_closed, std::pair<int, int>(index.first, index.second - 1)) && !isOpen(m_nodes[index.first][index.second - 1]))
+	if (index.second - 1 >= 0 && isTraversable(std::pair<int, int>(index.first, index.second - 1)) && !isOpen(m_nodes[index.first][index.second - 1]))
 	{
 		if (SDL_LockMutex(mutex) == 0)
 		{
@@ -83,7 +84,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 		}
 	}
 	//right
-	if (index.second + 1 < BOARDSIZE && isTraversable(m_closed, std::pair<int, int>(index.first, index.second + 1)) && !isOpen(m_nodes[index.first][index.second + 1]))
+	if (index.second + 1 < BOARDSIZE && isTraversable(std::pair<int, int>(index.first, index.second + 1)) && !isOpen(m_nodes[index.first][index.second + 1]))
 	{
 		if (SDL_LockMutex(mutex) == 0)
 		{
@@ -132,7 +133,7 @@ bool Astar::isOnList(std::vector<std::pair<int, int>>* list, std::pair<int, int>
 	return std::find(list->begin(), list->end(), item) != list->end();
 }
 
-bool Astar::isTraversable(std::vector<std::pair<int, int>> list, std::pair<int, int> item)
+bool Astar::isTraversable(std::pair<int, int> item)
 {
 	if (isOnList(&m_walls, item) || isOnList(&m_closed, item))
 	{

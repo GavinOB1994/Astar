@@ -9,20 +9,20 @@ using namespace std;
 const int SCREEN_FPS = 100;
 const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 
-
-
-int threadFunction(void* data)
-{
-	Astar *a = (Astar*)data;
-
-	while (a->getActive() != a->getGoal())
-	{
-		//cout << "astar" << endl;
-		a->doAstar();
-	}
-
-	return 0;
-}
+//
+//
+//int threadFunction(void* data)
+//{
+//	Astar *a = (Astar*)data;
+//
+//	while (a->getActive() != a->getGoal())
+//	{
+//		//cout << "astar" << endl;
+//		a->doAstar();
+//	}
+//
+//	return 0;
+//}
 
 
 
@@ -66,11 +66,16 @@ bool Game::init()
 	//}
 
 	
+	tPool = ThreadPool();
 
-	for (int i = 0; i < NOOFASTAR; i++)
-	{
-		astar.push_back(Astar(std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE), std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE)));
-	}
+	//for (int i = 0; i < NOOFASTAR; i++)
+	//{
+	//	astarArray.push_back(Astar(std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE), std::pair<int, int>(rand() % BOARDSIZE, rand() % BOARDSIZE)));
+	//}
+	//for (int i = 0; i < NOOFASTAR; i++) //Separated theese tow loops, so that astarArray was fully initialized
+	//{
+	//	jobQueue.push(&astarArray[i]);
+	//}
 
 
 	//astar = Astar(std::pair<int, int>(2, 2) , std::pair<int, int>(BOARDSIZE - 1, BOARDSIZE - 1)/*, &walls*/); //Create my instance of Astar
@@ -94,19 +99,31 @@ bool Game::init()
 	}
 
 
-	//Run the thread
-	int data = NULL;
-	SDL_Thread* thread1 = SDL_CreateThread(threadFunction, "Astar 1", &astar[0]);
-	SDL_Thread* thread2 = SDL_CreateThread(threadFunction, "Astar 2", &astar[1]);
-	SDL_Thread* thread3 = SDL_CreateThread(threadFunction, "Astar 3", &astar[2]);
-	SDL_Thread* thread4 = SDL_CreateThread(threadFunction, "Astar 4", &astar[3]);
-	SDL_Thread* thread5 = SDL_CreateThread(threadFunction, "Astar 5", &astar[4]);
+	//for (int i = 0; i < THREADNO; i++)
+	//{
+	//	threadArray.push_back(SDL_CreateThread(threadFunction, "Astar " + i, jobQueue.front()));
+	//	jobQueue.pop();
+	//}
 
-	SDL_DetachThread(thread1);
-	SDL_DetachThread(thread2);
-	SDL_DetachThread(thread3);
-	SDL_DetachThread(thread4);
-	SDL_DetachThread(thread5);
+	//for (int i = 0; i < THREADNO; i++)
+	//{
+	//	SDL_CreateThread(threadFunction, "Astar " + i, jobQueue.front());
+	//	jobQueue.pop();
+	//}
+
+	//Run the thread
+	//int data = NULL;
+	//SDL_Thread* thread1 = SDL_CreateThread(threadFunction, "Astar 1", NULL);
+	//SDL_Thread* thread2 = SDL_CreateThread(threadFunction, "Astar 2", NULL);
+	//SDL_Thread* thread3 = SDL_CreateThread(threadFunction, "Astar 3", NULL);
+	//SDL_Thread* thread4 = SDL_CreateThread(threadFunction, "Astar 4", NULL);
+	//SDL_Thread* thread5 = SDL_CreateThread(threadFunction, "Astar 5", NULL);
+
+	//SDL_DetachThread(thread1);
+	//SDL_DetachThread(thread2);
+	//SDL_DetachThread(thread3);
+	//SDL_DetachThread(thread4);
+	//SDL_DetachThread(thread5);
 
 	//want game loop to pause
 	inputManager.AddListener(EventListener::Event::PAUSE, this);
@@ -126,6 +143,14 @@ void Game::destroy()
 //** calls update on all game entities*/
 void Game::update()
 {
+	//for (int i = 0; i < THREADNO; i++)
+	//{
+	//	if (threadArray[i] == 0)
+	//	{
+	//		threadArray[i] = SDL_CreateThread(threadFunction, "Astar " + i, jobQueue.front());
+	//		jobQueue.pop();
+	//	}
+	//}
 	//while (astar.getActive() != astar.getGoal())
 	//{
 	//	astar.doAstar();
@@ -159,19 +184,19 @@ void Game::render()
 
 			for (int k = 0; k < NOOFASTAR; k++)
 			{
-				if (SDL_LockMutex(astar[k].getMutex()) == 0)
-				{
+				//if (SDL_LockMutex(astarArray[k].getMutex()) == 0)
+				//{
 					std::pair<int, int> index = std::pair<int, int>(i, j);
 
-					if (astar[k].getGoal() == index) //sets the goal tile to red
+					if (tPool.gatAstarArray()->at(k).getGoal() == index) //sets the goal tile to red
 						renderer.drawFillRect(board[i][j], red);
-					if (astar[k].getStart() == index) //sets the start tile to green
+					if (tPool.gatAstarArray()->at(k).getStart() == index) //sets the start tile to green
 						renderer.drawFillRect(board[i][j], green);
-					if (astar[k].getActive() == index) //sets the active tile to black
+					if (tPool.gatAstarArray()->at(k).getActive() == index) //sets the active tile to black
 						renderer.drawFillRect(board[i][j], black);
 
-					SDL_UnlockMutex(astar[k].getMutex());
-				}
+				//	SDL_UnlockMutex(astar[k].getMutex());
+				//}
 			}
 
 

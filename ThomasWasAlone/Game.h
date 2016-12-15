@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include "EventListener.h"
 #include "Constants.h"
+#include "ThreadPool.h"
 
 /** The game objct whic manages the game loop*/
 class Game:public EventListener
@@ -31,11 +32,17 @@ class Game:public EventListener
 	//std::vector<Rect> board;
 	std::vector<std::vector<Rect>> board;
 
+	ThreadPool tPool;
+
 	//std::vector<std::pair<int, int>> walls;
 
-	std::vector<Astar> astar;
+	//std::vector<Astar> astarArray;
 
-	std::queue<Astar*> jobQueue;
+	//std::vector<SDL_Thread*> threadArray;
+
+	//std::queue<Astar*> jobQueue;
+
+	//SDL_Thread* queueLock;
 
 	//Astar astar;
 	//Astar astar2;

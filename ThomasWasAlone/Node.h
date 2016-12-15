@@ -19,6 +19,7 @@ public:
 	std::pair<int, int> getPos();
 
 	Node(int, int);
+	Node() {};
 	~Node();
 };
 

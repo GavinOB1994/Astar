@@ -18,11 +18,13 @@ private:
 	std::pair<int, int> m_active;
 	std::pair<int, int> m_prevActive;
 
+	Node m_tempNode = Node();
+
 	SDL_mutex *mutex;
 
 public:
 	Astar() {};
-	Astar(std::pair<int, int>, std::pair<int, int>/*, std::vector<std::pair<int, int>>**/);
+	Astar(std::pair<int, int>, std::pair<int, int>);
 	~Astar();
 
 	void doAstar();
@@ -30,7 +32,7 @@ public:
 	Node getNode(std::pair<int, int>);
 
 	bool isOnList(std::vector<std::pair<int, int>>*, std::pair<int, int>);
-	bool isTraversable(std::vector<std::pair<int, int>>, std::pair<int, int>);
+	bool isTraversable(std::pair<int, int>);
 	bool isOpen(Node);
 
 	std::pair<int, int> getGoal();
