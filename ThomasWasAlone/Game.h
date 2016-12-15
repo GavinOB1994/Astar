@@ -34,22 +34,6 @@ class Game:public EventListener
 
 	ThreadPool tPool;
 
-	//std::vector<std::pair<int, int>> walls;
-
-	//std::vector<Astar> astarArray;
-
-	//std::vector<SDL_Thread*> threadArray;
-
-	//std::queue<Astar*> jobQueue;
-
-	//SDL_Thread* queueLock;
-
-	//Astar astar;
-	//Astar astar2;
-	//Astar astar3;
-	//Astar astar4;
-	//Astar astar5;
-
 	
 
 public:
@@ -58,7 +42,6 @@ public:
 
 	bool init();
 	void destroy();
-	//int threadFunction(void*);
 	void update();
 	void render();
 	void loop();

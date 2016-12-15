@@ -11,7 +11,8 @@ private:
 	std::vector<Astar> astarArray;
 	std::vector<SDL_Thread*> threadArray;
 	std::queue<Astar*> jobQueue;
-	SDL_mutex* queueLock;
+	//SDL_mutex* queueLock;
+	SDL_sem* semaphore;
 	std::pair<Astar*, std::queue<Astar*>*> holder;
 
 public:
@@ -22,7 +23,8 @@ public:
 
 	std::vector<Astar>* gatAstarArray();
 	std::queue<Astar*>* getQueue();
-	SDL_mutex* getMutex();
+	//SDL_mutex* getMutex();
+	SDL_sem* getSem();
 
 };
 

@@ -49,10 +49,6 @@ public:
 
 	SDL_mutex* getMutex();
 
-	//std::vector<std::pair<int, int>> getWalls();
-	//void setWall(std::pair<int, int>);
-	//void setWall(int, int);
-
 	std::vector<std::pair<int, int>> getClosed();
 	void setClosed(std::pair<int, int>);
 	void setClosed(int, int);

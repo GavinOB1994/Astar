@@ -20,7 +20,7 @@ Astar::Astar(std::pair<int, int> start, std::pair<int, int> end)
 	setStart(start);
 	setGoal(end);
 
-
+	mutex = SDL_CreateMutex();
 
 	//m_nodes[start.first][start.second] = Node(start.first, start.second);
 	m_nodes[start.first][start.second].calculateCosts(end, start);
@@ -32,6 +32,7 @@ Astar::Astar(std::pair<int, int> start, std::pair<int, int> end)
 
 Astar::~Astar()
 {
+	//SDL_DestroyMutex(mutex);
 }
 
 void Astar::doAstar()
@@ -40,7 +41,7 @@ void Astar::doAstar()
 
 
 
-	m_prevActive = m_active; //just before the new active is assigned keep reor od the old active
+	//m_prevActive = m_active; //just before the new active is assigned keep reor od the old active
 	m_tempNode = searchOrder.top();
 	searchOrder.pop(); //Remove from the priority queue
 	m_active = m_tempNode.getPos();
@@ -70,6 +71,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 			m_nodes[index.first + 1][index.second].calculateCosts(m_goal, m_start);
 			searchOrder.push(m_nodes[index.first + 1][index.second]);
 			setClosed(index.first + 1, index.second);
+			SDL_UnlockMutex(mutex);
 		}
 	}
 	//left
@@ -81,6 +83,7 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 			m_nodes[index.first][index.second - 1].calculateCosts(m_goal, m_start);
 			searchOrder.push(m_nodes[index.first][index.second - 1]);
 			setClosed(index.first, index.second - 1);
+			SDL_UnlockMutex(mutex);
 		}
 	}
 	//right
@@ -92,45 +95,18 @@ void Astar::calculateSurroundingCosts(std::pair<int, int> index)
 			m_nodes[index.first][index.second + 1].calculateCosts(m_goal, m_start);
 			searchOrder.push(m_nodes[index.first][index.second + 1]);
 			setClosed(index.first, index.second + 1);
+			SDL_UnlockMutex(mutex);
 		}
 	}
-	////upRight
-	//if ((index.first - 1 >= 0 && index.second + 1 < BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second + 1)) && !isOpen(m_nodes[index.first - 1][index.second + 1]))
-	//{
-	//	m_nodes[index.first - 1][index.second + 1] = Node(index.first - 1, index.second + 1);
-	//	m_nodes[index.first - 1][index.second + 1].calculateCosts(m_goal, m_start);
-	//	searchOrder.push(m_nodes[index.first - 1][index.second + 1]);
-	//	setClosed(index.first - 1, index.second + 1);
-	//}
-	////downRight
-	//if ((index.first + 1 < BOARDSIZE && index.second + 1 < BOARDSIZE) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second + 1)) && !isOpen(m_nodes[index.first + 1][index.second + 1]))
-	//{
-	//	m_nodes[index.first + 1][index.second + 1] = Node(index.first + 1, index.second + 1);
-	//	m_nodes[index.first + 1][index.second + 1].calculateCosts(m_goal, m_start);
-	//	searchOrder.push(m_nodes[index.first + 1][index.second + 1]);
-	//	setClosed(index.first + 1, index.second + 1);
-	//}
-	////upLeft
-	//if ((index.first - 1 >= 0 && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first - 1, index.second - 1)) && !isOpen(m_nodes[index.first - 1][index.second - 1]))
-	//{
-	//	m_nodes[index.first - 1][index.second - 1] = Node(index.first - 1, index.second - 1);
-	//	m_nodes[index.first - 1][index.second - 1].calculateCosts(m_goal, m_start);
-	//	searchOrder.push(m_nodes[index.first - 1][index.second - 1]);
-	//	setClosed(index.first - 1, index.second - 1);
-	//}
-	////downLeft
-	//if ((index.first + 1 < BOARDSIZE && index.second - 1 >= 0) && isTraversable(m_closed, std::pair<int, int>(index.first + 1, index.second - 1)) && !isOpen(m_nodes[index.first + 1][index.second - 1]))
-	//{
-	//	m_nodes[index.first + 1][index.second - 1] = Node(index.first + 1, index.second - 1);
-	//	m_nodes[index.first + 1][index.second - 1].calculateCosts(m_goal, m_start);
-	//	searchOrder.push(m_nodes[index.first + 1][index.second - 1]);
-	//	setClosed(index.first + 1, index.second - 1);
-	//}
 }
 
 bool Astar::isOnList(std::vector<std::pair<int, int>>* list, std::pair<int, int> item)
 {
-	return std::find(list->begin(), list->end(), item) != list->end();
+	if (SDL_LockMutex(mutex) == 0)
+	{
+		return std::find(list->begin(), list->end(), item) != list->end();
+		SDL_UnlockMutex(mutex);
+	}
 }
 
 bool Astar::isTraversable(std::pair<int, int> item)
@@ -175,10 +151,6 @@ SDL_mutex* Astar::getMutex()
 {
 	return mutex;
 }
-
-//std::vector<std::pair<int, int>> Astar::getWalls() { return m_walls; }
-//void Astar::setWall(std::pair<int, int> index) { m_walls.push_back(index); }
-//void Astar::setWall(int i, int j) { m_walls.push_back(std::pair<int, int>(i, j)); }
 
 std::vector<std::pair<int, int>> Astar::getClosed() { return m_closed; }
 void Astar::setClosed(std::pair<int, int> index) { m_closed.push_back(index); }
